@@ -4,14 +4,14 @@
 # Credited work: Rinck Sonnenberg (Netson)
 # @see https://github.com/netson/ubuntu-unattended
 
-# file names & paths
-tmp="/tmp"  # destination folder to store the final iso file
-hostname="ubuntu"
+TMP="/tmp"
+HOSTNAME="ubuntu"
+TIMEZONE="America/New_York"
+USER="admin"
+PASSWD="\\!QAZ2wsx"
 
-# define spinner function for slow tasks
-# courtesy of http://fitnr.com/showing-a-bash-spinner.html
-spinner()
-{
+spinner() {
+    # @see http://fitnr.com/showing-a-bash-spinner.html
     local pid=$1
     local delay=0.75
     local spinstr='|/-\'
@@ -25,87 +25,74 @@ spinner()
     printf "    \b\b\b\b"
 }
 
-# define download function
-# courtesy of http://fitnr.com/showing-file-download-progress-using-wget.html
-download()
-{
+download() {
+    # @see http://fitnr.com/showing-file-download-progress-using-wget.html
     local url=$1
     echo -n "    "
-    wget --progress=dot $url 2>&1 | grep --line-buffered "%" | \
+    wget --progress=dot "$url" 2>&1 | grep --line-buffered "%" | \
         sed -u -e "s,\.,,g" | awk '{printf("\b\b\b\b%4s", $2)}'
     echo -ne "\b\b\b\b"
-    echo " DONE"
+    echo " Done"
 }
 
-# define function to check if program is installed
-# courtesy of https://gist.github.com/JamieMason/4761049
-function program_is_installed {
-    # set to 1 initially
+program_is_installed() {
+    # @see https://gist.github.com/JamieMason/4761049
     local return_=1
-    # set to 0 if not found
-    type $1 >/dev/null 2>&1 || { local return_=0; }
-    # return value
+    type "$1" >/dev/null 2>&1 || { local return_=0; }
     echo $return_
 }
 
-# print a pretty header
-echo
-echo " +---------------------------------------------------+"
-echo " |            UNATTENDED UBUNTU ISO MAKER            |"
-echo " +---------------------------------------------------+"
-echo
+UNAME=$(uname | tr "[:upper:]" "[:lower:]")
+[ "$UNAME" == "linux" ] && {
+    [ -f /etc/lsb-release ] && DISTRO=$(lsb-release -is)
+}
+[ "$DISTRO" == "" ] && {
+    echo "Run this script on an Ubuntu system"
+    exit 1;
+}
 
-# ask whether to include vmware tools or not
 while true; do
-    echo " which ubuntu edition would you like to remaster:"
+    echo "Which Ubuntu version should be remastered:"
     echo
-    echo "  [1] Ubuntu 12.04.4 LTS Server amd64 - Precise Pangolin"
-    echo "  [2] Ubuntu 14.04.3 LTS Server amd64 - Trusty Tahr"
+    echo " [1] Ubuntu 14.04.3 LTS Server amd64 (Trusty Tahr)"
+    echo " [2] Ubuntu 15.04 Server amd64 (Vivid Vervet)"
+    echo " [3] Ubuntu 15.10 Server amd64 (Wily Werewolf)"
     echo
-    read -p " please enter your preference: [1|2]: " ubver
+    read -rp " [1|2|3]: " ubver
     case $ubver in
-        [1]* )  download_file="ubuntu-12.04.4-server-amd64.iso"           # filename of the iso to be downloaded
-                download_location="http://releases.ubuntu.com/12.04/"     # location of the file to be downloaded
-                new_iso_name="ubuntu-12.04.4-server-amd64-unattended.iso" # filename of the new iso file to be created
+        [1]* )  DL_FILE="ubuntu-14.04.3-server-amd64.iso"
+                DL_LOC="http://releases.ubuntu.com/trusty/"
+                ISO="ubuntu-14.04.3-server-amd64-unattended.iso"
                 break;;
-        [2]* )  download_file="ubuntu-14.04.3-server-amd64.iso"             # filename of the iso to be downloaded
-                download_location="http://releases.ubuntu.com/14.04/"     # location of the file to be downloaded
-                new_iso_name="ubuntu-14.04.3-server-amd64-unattended.iso"   # filename of the new iso file to be created
+        [2]* )  DL_FILE="ubuntu-15.04-server-amd64.iso"
+                DL_LOC="http://releases.ubuntu.com/vivid/"
+                ISO="ubuntu-15.04-server-amd64-unattended.iso"
                 break;;
-        * ) echo " please answer [1] or [2]";;
+        [3]* )  DL_FILE="ubuntu-15.10-server-amd64.iso"
+                DL_LOC="http://releases.ubuntu.com/wily/"
+                ISO="ubuntu-15.10-server-amd64-unattended.iso"
+                break;;
+        * ) echo " please answer 1 or 2 or 3";;
     esac
 done
 
-# ask the user questions about his/her preferences
-read -ep " please enter your preferred timezone: " -i "Europe/Amsterdam" timezone
-read -ep " please enter your preferred username: " -i "netson" username
-read -sp " please enter your preferred password: " password
-printf "\n"
-read -sp " confirm your preferred password: " password2
-printf "\n"
-read -ep " Make ISO bootable via USB: " -i "yes" bootable
+read -erp "Timezone: " -i "$TIMEZONE" TIMEZONE
+read -erp "User name: " -i "$USER" USER
+read -srp "Password: " -i "$PASSWD" PASSWD
+read -erp "Make ISO bootable via USB [Y|n]: " -i 'Y' BOOTABLE
 
-# check if the passwords match to prevent headaches
-if [[ "$password" != "$password2" ]]; then
-    echo " your passwords do not match; please restart the script and try again"
-    echo
-    exit
+cd $TMP
+[[ -f $TMP/$DL_FILE ]] || {
+    echo -n "Downloading $DL_FILE: "
+    download "$DL_LOC$DL_FILE"
+}
+
+DEFAULTS="ubuntu.seed"
+if [[ ! -f $TMP/$DEFAULTS ]]; then
+    echo -h " downloading $DEFAULTS: "
+    download "http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/$DEFAULTS"
 fi
-
-# download the ubunto iso
-cd $tmp
-if [[ ! -f $tmp/$download_file ]]; then
-    echo -n " downloading $download_file: "
-    download "$download_location$download_file"
-fi
-
-# download netson seed file
-seed_file="netson.seed"
-if [[ ! -f $tmp/$seed_file ]]; then
-    echo -h " downloading $seed_file: "
-    download "https://github.com/netson/ubuntu-unattended/raw/master/$seed_file"
-fi
-
+ ======
 # install required packages
 echo " installing required packages"
 if [ $(program_is_installed "mkpasswd") -eq 0 ] || [ $(program_is_installed "mkisofs") -eq 0 ]; then
@@ -124,36 +111,36 @@ fi
 
 # create working folders
 echo " remastering your iso file"
-mkdir -p $tmp
-mkdir -p $tmp/iso_org
-mkdir -p $tmp/iso_new
+mkdir -p $TMP
+mkdir -p $TMP/iso_org
+mkdir -p $TMP/iso_new
 
 # mount the image
-if grep -qs $tmp/iso_org /proc/mounts ; then
+if grep -qs $TMP/iso_org /proc/mounts ; then
     echo " image is already mounted, continue"
 else
-    (mount -o loop $tmp/$download_file $tmp/iso_org > /dev/null 2>&1)
+    (mount -o loop $TMP/$DL_FILE $TMP/iso_org > /dev/null 2>&1)
 fi
 
 # copy the iso contents to the working directory
-(cp -rT $tmp/iso_org $tmp/iso_new > /dev/null 2>&1) &
+(cp -rT $TMP/iso_org $TMP/iso_new > /dev/null 2>&1) &
 spinner $!
 
 # set the language for the installation menu
-cd $tmp/iso_new
-echo en > $tmp/iso_new/isolinux/lang
+cd $TMP/iso_new
+echo en > $TMP/iso_new/isolinux/lang
 
 # set late command
 late_command="chroot /target wget -O /home/$username/start.sh https://github.com/netson/ubuntu-unattended/raw/master/start.sh ;\
     chroot /target chmod +x /home/$username/start.sh ;"
 
 # copy the netson seed file to the iso
-cp -rT $tmp/$seed_file $tmp/iso_new/preseed/$seed_file
+cp -rT $TMP/$DEFAULTS $TMP/iso_new/preseed/$DEFAULTS
 
 # include firstrun script
 echo "
 # setup firstrun script
-d-i preseed/late_command                                    string      $late_command" >> $tmp/iso_new/preseed/$seed_file
+d-i preseed/late_command                                    string      $late_command" >> $TMP/iso_new/preseed/$DEFAULTS
 
 # generate the password hash
 pwhash=$(echo $password | mkpasswd -s -m sha-512)
@@ -161,53 +148,41 @@ pwhash=$(echo $password | mkpasswd -s -m sha-512)
 # update the seed file to reflect the users' choices
 # the normal separator for sed is /, but both the password and the timezone may contain it
 # so instead, I am using @
-sed -i "s@{{username}}@$username@g" $tmp/iso_new/preseed/$seed_file
-sed -i "s@{{pwhash}}@$pwhash@g" $tmp/iso_new/preseed/$seed_file
-sed -i "s@{{hostname}}@$hostname@g" $tmp/iso_new/preseed/$seed_file
-sed -i "s@{{timezone}}@$timezone@g" $tmp/iso_new/preseed/$seed_file
+sed -i "s@{{username}}@$username@g" $TMP/iso_new/preseed/$DEFAULTS
+sed -i "s@{{pwhash}}@$pwhash@g" $TMP/iso_new/preseed/$DEFAULTS
+sed -i "s@{{hostname}}@$hostname@g" $TMP/iso_new/preseed/$DEFAULTS
+sed -i "s@{{timezone}}@$timezone@g" $TMP/iso_new/preseed/$DEFAULTS
 
 # calculate checksum for seed file
-seed_checksum=$(md5sum $tmp/iso_new/preseed/$seed_file)
+seed_checksum=$(md5sum $TMP/iso_new/preseed/$DEFAULTS)
 
 # add the autoinstall option to the menu
 sed -i "/label install/ilabel autoinstall\n\
   menu label ^Autoinstall NETSON Ubuntu Server\n\
   kernel /install/vmlinuz\n\
-  append file=/cdrom/preseed/ubuntu-server.seed initrd=/install/initrd.gz auto=true priority=high preseed/file=/cdrom/preseed/netson.seed preseed/file/checksum=$seed_checksum --" $tmp/iso_new/isolinux/txt.cfg
+  append file=/cdrom/preseed/ubuntu-server.seed initrd=/install/initrd.gz auto=true priority=high preseed/file=/cdrom/preseed/netson.seed preseed/file/checksum=$seed_checksum --" $TMP/iso_new/isolinux/txt.cfg
 
 echo " creating the remastered iso"
-cd $tmp/iso_new
-(mkisofs -D -r -V "NETSON_UBUNTU" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $tmp/$new_iso_name . > /dev/null 2>&1) &
+cd $TMP/iso_new
+(mkisofs -D -r -V "NETSON_UBUNTU" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $TMP/$ISO . > /dev/null 2>&1) &
 spinner $!
 
 # make iso bootable (for dd'ing to  USB stick)
 if [[ $bootable == "yes" ]] || [[ $bootable == "y" ]]; then
-    isohybrid $tmp/$new_iso_name
+    isohybrid $TMP/$ISO
 fi
 
 # cleanup
-umount $tmp/iso_org
-rm -rf $tmp/iso_new
-rm -rf $tmp/iso_org
+umount $TMP/iso_org
+rm -rf $TMP/iso_new
+rm -rf $TMP/iso_org
 
 # print info to user
 echo " -----"
 echo " finished remastering your ubuntu iso file"
-echo " the new file is located at: $tmp/$new_iso_name"
+echo " the new file is located at: $TMP/$ISO"
 echo " your username is: $username"
 echo " your password is: $password"
 echo " your hostname is: $hostname"
 echo " your timezone is: $timezone"
 echo
-
-# unset vars
-unset username
-unset password
-unset hostname
-unset timezone
-unset pwhash
-unset download_file
-unset download_location
-unset new_iso_name
-unset tmp
-unset seed_file

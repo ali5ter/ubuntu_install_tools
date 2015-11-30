@@ -4,6 +4,7 @@ Scripts to help speed up the installation and configuration of an ubuntu server.
 Tested for installations of:
 * Ubuntu 14.04 (Trusty Tahr)
 * Ubuntu 15.04 (Vivid Vervet)
+* Ubuntu 15.10 (Wily Werewolf)
 
 ## Installation
 [TODO]

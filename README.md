@@ -1,4 +1,4 @@
-= Ubuntu Install Tools
+# Ubuntu Install Tools
 
 Scripts to help speed up the installation and configuration of an ubuntu server.
 
@@ -7,8 +7,10 @@ Tested for installations of:
 * Ubuntu 15.04 (Vivid Vervet)
 
 ## Installation
+[TODO]
 
 ## Configuration
+[TODO]
 
 ## Contribution
 If you've stumbled upon this project and wish to contribute, please 

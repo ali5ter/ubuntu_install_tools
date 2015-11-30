@@ -1,3 +1,0 @@
-[submodule "3rdParty/ubuntu-unattended"]
-	path = 3rdParty/ubuntu-unattended
-	url = https://github.com/netson/ubuntu-unattended.git

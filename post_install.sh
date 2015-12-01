@@ -78,8 +78,8 @@ service ssh restart
 [ -f /etc/motd ] || {
     apt-get install -y figlet
     { \
-        figlet "$HOSTNAME"; \
-        echo -e "\nWelcome to $HOSTNAME\n"; \
+        figlet "$FQDN"; \
+        echo -e "\nWelcome to $FQDN\n"; \
         echo "Any malicious and/or unauthorized activity is strictly forbidden."; \
         echo "All activity may be logged."; \
     } > /etc/motd

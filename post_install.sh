@@ -25,12 +25,16 @@ DOMAIN="${2:-'.local'}"
     exit 1
 }
 
+echo
 read -erp "Preferred hostname: " -i "$HOSTNAME" HOSTNAME
 read -erp "Preferred domain: " -i "$DOMAIN" DOMAIN
 
 FQDN="$HOSTNAME.$DOMAIN"
 
-echo "Configuring this $(lsb_release -ds) server..."
+echo
+echo "Configuring this $(lsb_release -ds) server with the dollowing spec:"
+echo "  Hostname: $HOSTNAME ($FQDN)"
+echo
 
 # ============================================================================
 # Patch the OS
@@ -38,20 +42,24 @@ echo "Configuring this $(lsb_release -ds) server..."
 echo "$HOSTNAME" > /etc/hostname
 sed -i "s@ubuntu.ubuntu@$FQDN@g" /etc/hosts
 sed -i "s@ubuntu@$HOSTNAME@g" /etc/hosts
+## TODO: append line instead of trying to replace
+## 127.0.0.1    localhost
+## 127.0.0.1    $FQDN   $HOSTNAME
 hostname "$HOSTNAME"
 
-apt-get update -y > /dev/null 2>&1
-apt-get upgrade -y > /dev/null 2>&1
-apt-get dist-upgrade -y > /dev/null 2>&1
-apt-get autoremove -y > /dev/null 2>&1
-apt-get purge -y > /dev/null 2>&1
+apt-get update -y
+apt-get upgrade -y
+apt-get dist-upgrade -y
+apt-get autoremove -y
+apt-get purge -y
 
-apt-get install -y openssh-server > /dev/null 2>&1
-apt-get install -y open-vmware-tools > /dev/null 2>&1
-apt-get install -y git > /dev/null 2>&1
+apt-get install -y openssh-server
+apt-get install -y open-vmware-tools
+apt-get install -y git
 
-echo "PermitRootLogin no" >> /etc/ssh/sshd_config
-service ssh restart
+# Default is now PermitRootLogin without-password
+#echo "PermitRootLogin no" >> /etc/ssh/sshd_config
+#service ssh restart
 
 #ufw allow ssh
 #ufw allow 80/tcp
@@ -65,7 +73,7 @@ mkswap /swapfile
 swapon /swapfile
 sh -c 'echo "/swapfile none swap sw 0 0" >> /etc/fstab'
 
-apt-get install -y figlet > /dev/null 2>&1
+apt-get install -y figlet
 echo > /etc/motd
 { \
     figlet "$HOSTNAME"; \
@@ -73,7 +81,8 @@ echo > /etc/motd
     echo "Any malicious and/or unauthorized activity is strictly forbidden."; \
     echo "All activity may be logged."; \
 } >> /etc/motd
-apt-get purge figlet > /dev/null 2>&1
+echo /etc/motd
+apt-get purge figlet
 
 # ============================================================================
 # Alternate root account

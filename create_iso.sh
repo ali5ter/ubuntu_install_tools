@@ -47,6 +47,11 @@ TIMEZONE="America/New_York"
 USER="admin"
 PASSWD="\\!QAZ2wsx"
 
+[ "$(id -u)" != "0" ] && {
+    echo "This script should be run as root" 1>&2
+    exit 1
+}
+
 UNAME=$(uname | tr "[:upper:]" "[:lower:]")
 [ "$UNAME" == "linux" ] && {
     [ -f /etc/lsb-release ] && DISTRO=$(lsb_release -is)

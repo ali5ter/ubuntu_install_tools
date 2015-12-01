@@ -11,7 +11,7 @@ randomWord() {
     local file=/usr/share/dict/words
     length="$(cat $file | wc -l)"
     n=$(expr $RANDOM \* $length \/ 32768 + 1)
-    head -n $n $file | tail -1
+    head -n $n $file | tail -1 | tr "[:upper:]" "[:lower:]"
 }
 
 # ============================================================================
@@ -90,11 +90,10 @@ service ssh restart
 # Alternate root account
 
 USER="$SUDO_USER"
-SRC="~$USER/src"
 
 su "$USER" <<"END_OF_ADMIN_COMMANDS"
-mkdir -p "$SRC"
-cd "$SRC"
+mkdir -p src
+cd src
 git clone http://gitlab.different.com/alister/carrybag.git
 cd carrybag
 ./tools/install.sh -q

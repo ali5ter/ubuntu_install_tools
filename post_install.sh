@@ -77,14 +77,12 @@ service ssh restart
 
 [ -f /etc/motd ] || {
     apt-get install -y figlet
-    echo > /etc/motd
     { \
         figlet "$HOSTNAME"; \
-        echo -n "\nWelcome to $HOSTNAME\n"; \
+        echo -e "\nWelcome to $HOSTNAME\n"; \
         echo "Any malicious and/or unauthorized activity is strictly forbidden."; \
         echo "All activity may be logged."; \
-    } >> /etc/motd
-    echo /etc/motd
+    } > /etc/motd
     apt-get purge figlet
 }
 
@@ -94,11 +92,11 @@ service ssh restart
 USER="$SUDO_USER"
 
 su "$USER" <<"END_OF_ADMIN_COMMANDS"
-mkdir "$SRC" > /dev/null 2>&1
-cd "$SRC" > /dev/null 2>&1
-git clone http://gitlab.different.com/alister/carrybag.git > /dev/null 2>&1
-cd carrybag > /dev/null 2>&1
-./tools/install.sh -q > /dev/null 2>&1
+mkdir "$SRC"
+cd "$SRC"
+git clone http://gitlab.different.com/alister/carrybag.git
+cd carrybag
+./tools/install.sh -q
 END_OF_ADMIN_COMMANDS
 
 exit 0

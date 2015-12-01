@@ -13,10 +13,10 @@ spinner(){
     while [ $(ps -eo pid | grep $pid) ]; do
         for i in \| / - \\; do
             printf ' [%c]\b\b\b\b' $i
-                sleep $delay
-                done
-                done
-                printf '\b\b\b\b'
+            sleep $delay
+        done
+    done
+    echo -ne "\b\b\b\b"
 }
 
 download() {

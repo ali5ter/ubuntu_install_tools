@@ -18,7 +18,7 @@ randomWord() {
 # Environment
 
 HOSTNAME="${1:-$(randomWord)}"
-DOMAIN="${2:-'.local'}"
+DOMAIN="${2:-local}"
 
 [ "$(id -u)" != "0" ] && {
     echo "This script should be run as root" 1>&2
@@ -40,11 +40,8 @@ echo
 # Patch the OS
 
 echo "$HOSTNAME" > /etc/hostname
-sed -i "s@ubuntu.ubuntu@$FQDN@g" /etc/hosts
-sed -i "s@ubuntu@$HOSTNAME@g" /etc/hosts
-## TODO: append line instead of trying to replace
-## 127.0.0.1    localhost
-## 127.0.0.1    $FQDN   $HOSTNAME
+sed -i "/127.0.0.1\tlocalhost/a\\
+127.0.0.1\t$FQDN\t$HOSTNAME" /etc/hosts
 hostname "$HOSTNAME"
 
 apt-get update -y
@@ -54,12 +51,15 @@ apt-get autoremove -y
 apt-get purge -y
 
 apt-get install -y openssh-server
-apt-get install -y open-vmware-tools
+if [ "$(lsb_release -cs)" == "trusty" ]; then
+    apt-get install -y open-vm-tools-lts-trusty
+else
+    apt-get install -y open-vm-tools
+fi
 apt-get install -y git
 
-# Default is now PermitRootLogin without-password
-#echo "PermitRootLogin no" >> /etc/ssh/sshd_config
-#service ssh restart
+sed -i s/without-password/no/ /etc/ssh/sshd_config
+service ssh restart
 
 #ufw allow ssh
 #ufw allow 80/tcp
@@ -67,22 +67,26 @@ apt-get install -y git
 #ufw allow 25/tcp
 #ufw enable
 
-fallocate -l 4G /swapfile
-chmod 600 /swapfile
-mkswap /swapfile
-swapon /swapfile
-sh -c 'echo "/swapfile none swap sw 0 0" >> /etc/fstab'
+[ -f /swapfile ] || {
+    fallocate -l 4G /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile
+    swapon /swapfile
+    sh -c 'echo "/swapfile none swap sw 0 0" >> /etc/fstab'
+}
 
-apt-get install -y figlet
-echo > /etc/motd
-{ \
-    figlet "$HOSTNAME"; \
-    echo -n "\nWelcome to $HOSTNAME\n"; \
-    echo "Any malicious and/or unauthorized activity is strictly forbidden."; \
-    echo "All activity may be logged."; \
-} >> /etc/motd
-echo /etc/motd
-apt-get purge figlet
+[ -f /etc/motd ] || {
+    apt-get install -y figlet
+    echo > /etc/motd
+    { \
+        figlet "$HOSTNAME"; \
+        echo -n "\nWelcome to $HOSTNAME\n"; \
+        echo "Any malicious and/or unauthorized activity is strictly forbidden."; \
+        echo "All activity may be logged."; \
+    } >> /etc/motd
+    echo /etc/motd
+    apt-get purge figlet
+}
 
 # ============================================================================
 # Alternate root account

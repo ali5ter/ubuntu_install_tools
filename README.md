@@ -11,7 +11,7 @@ Run the `create_iso.sh` script to build a customized version of an Ubuntu Server
 
 You could run it without cloning this repository using
 
-    $(wget -qO - http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/create_iso.sh | bash)
+    wget -O - http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/create_iso.sh | bash
 
 The script will ask what version of Ubuntu to use and the account credentials the installation should create.
 
@@ -20,11 +20,11 @@ The script will ask what version of Ubuntu to use and the account credentials th
 ## Configuration
 Run the `post_install.sh` script. You could run it without cloning this repository using
 
-    $(wget -qO - http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/post_install.sh | bash)
+    wget -O - http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/post_install.sh | bash
 
 You can change the defaults located at the top of this shell script or change them from teh command line. To do this with the command above use
 
-    $(wget -qO - http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/post_install.sh | bash -s <hostname> <domain> <username> <password>)
+    wget -O - http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/post_install.sh | bash -s <hostname> <domain>
 
 ## Contribution
 If you've stumbled upon this project and wish to contribute, please [let me know](mailto:alister@different.com).

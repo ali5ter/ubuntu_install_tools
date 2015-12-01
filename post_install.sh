@@ -93,7 +93,7 @@ USER="$SUDO_USER"
 SRC="~$USER/src"
 
 su "$USER" <<"END_OF_ADMIN_COMMANDS"
-mkdir "$SRC"
+mkdir -p "$SRC"
 cd "$SRC"
 git clone http://gitlab.different.com/alister/carrybag.git
 cd carrybag

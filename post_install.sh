@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-# Post installation script to configure ubuntu
+# @file post_install.sh
+# Post installation script to configure Ubuntu
+# @see https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-14-04
+# @see https://www.digitalocean.com/community/tutorials/additional-recommended-steps-for-new-ubuntu-14-04-servers
+# @see https://github.com/netson/ubuntu-unattended
+# @see http://gitlab.different.com/alister/carrybag/
 
 set -e
 

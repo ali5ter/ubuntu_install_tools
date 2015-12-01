@@ -29,8 +29,6 @@ You can change the defaults located at the top of this shell script or change th
 ## Contribution
 If you've stumbled upon this project and wish to contribute, please [let me know](mailto:alister@different.com).
 
-## Reference
-* [Unattended installation](http://askubuntu.com/questions/122505/how-do-i-create-a-completely-unattended-install-of-ubuntu)
-* [Additional recommended steps](https://www.digitalocean.com/community/tutorials/additional-recommended-steps-for-new-ubuntu-14-04-servers)
-* [Post install using puppet](https://github.com/netson/ubuntu-unattended/blob/master/start.sh)
-* [Carrybag](http://gitlab.different.com/alister/carrybag/)
+## Credits
+* [Netson's Unattended Ubuntu ISO Maker](https://github.com/netson/ubuntu-unattended)
+* [Justin Ellingwood's Digital Ocean tutorials](https://www.digitalocean.com/community/tutorials/additional-recommended-steps-for-new-ubuntu-14-04-servers)

@@ -109,12 +109,14 @@ read -erp "Make ISO bootable via USB [Y|n]: " -i 'Y' BOOTABLE
 
 cd "$TMP"
 [[ -f "$TMP/$DL_FILE" ]] || {
+    echo
     echo -n "Downloading $DL_FILE: "
     download "$DL_LOC$DL_FILE"
 }
 
 DEFAULTS="ubuntu.seed"
 [[ -f "$TMP/$DEFAULTS" ]] || {
+    echo
     echo -n "Downloading $DEFAULTS: "
     download "http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/$DEFAULTS"
 }
@@ -124,6 +126,7 @@ DEFAULTS="ubuntu.seed"
 
 [[ $BOOTABLE == "Y" ]] && {
     [ "$(program_is_installed isohybrid)" -eq 0 ] && {
+        echo
         (apt-get -y install syslinux > /dev/null 2>&1) &
         spinner $!
     }

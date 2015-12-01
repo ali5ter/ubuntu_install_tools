@@ -83,13 +83,14 @@ service ssh restart
         echo "Any malicious and/or unauthorized activity is strictly forbidden."; \
         echo "All activity may be logged."; \
     } > /etc/motd
-    apt-get purge figlet
+    apt-get purge -y figlet
 }
 
 # ============================================================================
 # Alternate root account
 
 USER="$SUDO_USER"
+SRC="~$USER/src"
 
 su "$USER" <<"END_OF_ADMIN_COMMANDS"
 mkdir "$SRC"
@@ -98,8 +99,6 @@ git clone http://gitlab.different.com/alister/carrybag.git
 cd carrybag
 ./tools/install.sh -q
 END_OF_ADMIN_COMMANDS
-
-exit 0
 
 # ============================================================================
 # Clean up

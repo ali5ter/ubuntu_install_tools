@@ -6,17 +6,17 @@
 
 set -e
 
-spinner() {
+spinner(){
     # @see http://fitnr.com/showing-a-bash-spinner.html
     local pid=$1
-    local spinstr='|/-\'
-    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
-        local temp=${spinstr#?}
-        printf "%c" "$spinstr"
-        local spinstr=$temp${spinstr%"$temp"}
-        printf "\b\b"
-    done
-    printf "\b\b"
+    local delay=0.25
+    while [ $(ps -eo pid | grep $pid) ]; do
+        for i in \| / - \\; do
+            printf ' [%c]\b\b\b\b' $i
+                sleep $delay
+                done
+                done
+                printf '\b\b\b\b'
 }
 
 download() {

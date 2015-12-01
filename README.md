@@ -7,13 +7,15 @@ Tested for installations of:
 * Ubuntu 15.10 (Wily Werewolf)
 
 ## Installation
-Run the `create_iso.sh` script to build a customized version of an Ubuntu Server ISO that will perform an unattended installation.
 
-You could run it without cloning this repository using
+Download the `create_iso.sh` script and run it. This will build a customized version of an Ubuntu Server ISO that will perform an unattended installation.
 
-    wget -O - http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/create_iso.sh | bash
+    wget -O - http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/create_iso.sh
+    ./create_iso.sh
 
 The script will ask what version of Ubuntu to use and the account credentials the installation should create.
+
+The resulting ISO can be burnt to CDROM or USB drive or used to create a virtual machine.
 
 [Some utility to create an ESX or Fusion VM using this ISO]
 

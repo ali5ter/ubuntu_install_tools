@@ -180,6 +180,11 @@ sed -i "/label install/ilabel autoinstall\n\
   kernel /install/vmlinuz\n\
   append file=/cdrom/preseed/ubuntu-server.seed initrd=/install/initrd.gz auto=true priority=high preseed/file=/cdrom/preseed/ubuntu.seed preseed/file/checksum=$CHECKSUM --" "$ISO_NEW/isolinux/txt.cfg"
 
+## Automate the selection of prompt 0 in the menu
+sed -i 's/^timeout 0$/timeout 1/' "$ISO_NEW/isolinux/isolinux.cfg"
+sed -i '/set menu_color_highlight/ a set default=0' "$ISO_NEW/boot/grub/grub.cfg"
+sed -i '/set menu_color_highlight/ a set timeout=10' "$ISO_NEW/iso_new/boot/grub/grub.cfg"
+
 ## Create the remastered ISO
 (mkisofs -D -r -V "CARRYBAG_UBUNTU" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 5 -boot-info-table -o $TMP/$ISO . > /dev/null 2>&1) &
 spinner $!

@@ -4,11 +4,7 @@
 # Credited work: Rinck Sonnenberg (Netson)
 # @see https://github.com/netson/ubuntu-unattended
 
-TMP="/tmp"
-HOSTNAME="ubuntu"
-TIMEZONE="America/New_York"
-USER="admin"
-PASSWD="\\!QAZ2wsx"
+set -e
 
 spinner() {
     # @see http://fitnr.com/showing-a-bash-spinner.html
@@ -42,6 +38,15 @@ program_is_installed() {
     echo $return_
 }
 
+# ============================================================================
+# Environment
+
+TMP="/tmp"
+HOSTNAME="ubuntu"
+TIMEZONE="America/New_York"
+USER="admin"
+PASSWD="\\!QAZ2wsx"
+
 UNAME=$(uname | tr "[:upper:]" "[:lower:]")
 [ "$UNAME" == "linux" ] && {
     [ -f /etc/lsb-release ] && DISTRO=$(lsb-release -is)
@@ -50,6 +55,16 @@ UNAME=$(uname | tr "[:upper:]" "[:lower:]")
     echo "Run this script on an Ubuntu system"
     exit 1;
 }
+
+if [ $(program_is_installed "mkpasswd") -eq 0 ] || [ $(program_is_installed "mkisofs") -eq 0 ]; then
+    (apt-get -y update > /dev/null 2>&1) &
+    spinner $!
+    (apt-get -y install whois genisoimage > /dev/null 2>&1) &
+    spinner $!
+fi
+
+# ============================================================================
+# User prompts
 
 while true; do
     echo "Which Ubuntu version should be remastered:"
@@ -81,108 +96,97 @@ read -erp "User name: " -i "$USER" USER
 read -srp "Password: " -i "$PASSWD" PASSWD
 read -erp "Make ISO bootable via USB [Y|n]: " -i 'Y' BOOTABLE
 
-cd $TMP
-[[ -f $TMP/$DL_FILE ]] || {
-    echo -n "Downloading $DL_FILE: "
+# ============================================================================
+# Download files
+
+cd "$TMP"
+[[ -f "$TMP/$DL_FILE" ]] || { echo -n "Downloading $DL_FILE: "
     download "$DL_LOC$DL_FILE"
 }
 
 DEFAULTS="ubuntu.seed"
-if [[ ! -f $TMP/$DEFAULTS ]]; then
-    echo -h " downloading $DEFAULTS: "
+[[ -f "$TMP/$DEFAULTS" ]] || {
+    echo -n "Downloading $DEFAULTS: "
     download "http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/$DEFAULTS"
-fi
- ======
-# install required packages
-echo " installing required packages"
-if [ $(program_is_installed "mkpasswd") -eq 0 ] || [ $(program_is_installed "mkisofs") -eq 0 ]; then
-    (apt-get -y update > /dev/null 2>&1) &
-    spinner $!
-    (apt-get -y install whois genisoimage > /dev/null 2>&1) &
-    spinner $!
-fi
-if [[ $bootable == "yes" ]] || [[ $bootable == "y" ]]; then
-    if [ $(program_is_installed "isohybrid") -eq 0 ]; then
+}
+
+# ============================================================================
+# Optional software for bootable USB
+
+[[ $BOOTABLE == "Y" ]] && {
+    [ "$(program_is_installed isohybrid)" -eq 0 ] && {
         (apt-get -y install syslinux > /dev/null 2>&1) &
         spinner $!
-    fi
-fi
+    }
+}
 
+# ============================================================================
+# Reconstruct the ISO image
 
-# create working folders
-echo " remastering your iso file"
-mkdir -p $TMP
-mkdir -p $TMP/iso_org
-mkdir -p $TMP/iso_new
+ISO_SRC="$TMP/iso_src"
+ISO_NEW="$TMP/iso_new"
+mkdir -p "$ISO_SRC"
+mkdir -p "$ISO_NEW"
 
-# mount the image
-if grep -qs $TMP/iso_org /proc/mounts ; then
-    echo " image is already mounted, continue"
-else
-    (mount -o loop $TMP/$DL_FILE $TMP/iso_org > /dev/null 2>&1)
-fi
-
-# copy the iso contents to the working directory
-(cp -rT $TMP/iso_org $TMP/iso_new > /dev/null 2>&1) &
+## Mount the downloaded ISO image and copy the contents to tmp directory
+grep -qs "$ISO_SRC" /proc/mounts || \
+         mount -o loop "$TMP/$DL_FILE" "$ISO_SRC" > /dev/null 2>&1
+(cp -rT "$ISO_SRC" "$ISO_NEW" > /dev/null 2>&1) &
 spinner $!
 
-# set the language for the installation menu
-cd $TMP/iso_new
-echo en > $TMP/iso_new/isolinux/lang
+cd "$ISO_NEW"
 
-# set late command
-late_command="chroot /target wget -O /home/$username/start.sh https://github.com/netson/ubuntu-unattended/raw/master/start.sh ;\
-    chroot /target chmod +x /home/$username/start.sh ;"
+## Set the language for the installation menu
+echo en > "$ISO_NEW/isolinux/lang"
 
-# copy the netson seed file to the iso
-cp -rT $TMP/$DEFAULTS $TMP/iso_new/preseed/$DEFAULTS
+## Create the late command for post installation configuration
+LATE_CMD="chroot /target wget -O /home/$USER/post_install.sh http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/post_install.sh;\
+    chroot /target chmod +x /home/$USER/post_install.sh ;"
 
-# include firstrun script
+## Copy the defaults file to the ISO
+cp -rT "$TMP/$DEFAULTS $TMP/iso_new/preseed/$DEFAULTS"
+
+## Append the late command
 echo "
-# setup firstrun script
-d-i preseed/late_command                                    string      $late_command" >> $TMP/iso_new/preseed/$DEFAULTS
+# Post installation script
+d-i preseed/late_command                                    string      $LATE_CMD" >> "$ISO_NEW/preseed/$DEFAULTS"
 
-# generate the password hash
-pwhash=$(echo $password | mkpasswd -s -m sha-512)
+## Generate the password hash
+EPASSWD="$(echo $PASSWD | mkpasswd -s -m sha-512)"
 
-# update the seed file to reflect the users' choices
-# the normal separator for sed is /, but both the password and the timezone may contain it
-# so instead, I am using @
-sed -i "s@{{username}}@$username@g" $TMP/iso_new/preseed/$DEFAULTS
-sed -i "s@{{pwhash}}@$pwhash@g" $TMP/iso_new/preseed/$DEFAULTS
-sed -i "s@{{hostname}}@$hostname@g" $TMP/iso_new/preseed/$DEFAULTS
-sed -i "s@{{timezone}}@$timezone@g" $TMP/iso_new/preseed/$DEFAULTS
+## Update the defaults with the user prompted data
+sed -i "s@{{username}}@$USER@g" "$ISO_NEW/preseed/$DEFAULTS"
+sed -i "s@{{pwhash}}@$EPASSWD@g" "$ISO_NEW/preseed/$DEFAULTS"
+sed -i "s@{{hostname}}@$HOSTNAME@g" "$ISO_NEW/preseed/$DEFAULTS"
+sed -i "s@{{timezone}}@$TIMEZONE@g" "$ISO_NEW/preseed/$DEFAULTS"
 
-# calculate checksum for seed file
-seed_checksum=$(md5sum $TMP/iso_new/preseed/$DEFAULTS)
+## Calculate the checksum for the defaults file
+CHECKSUM=$(md5sum $ISO_NEW/preseed/$DEFAULTS)
 
-# add the autoinstall option to the menu
+## Add the autoinstall option to the menu
 sed -i "/label install/ilabel autoinstall\n\
-  menu label ^Autoinstall NETSON Ubuntu Server\n\
+  menu label ^Autoinstall CarryBag Ubuntu Server\n\
   kernel /install/vmlinuz\n\
-  append file=/cdrom/preseed/ubuntu-server.seed initrd=/install/initrd.gz auto=true priority=high preseed/file=/cdrom/preseed/netson.seed preseed/file/checksum=$seed_checksum --" $TMP/iso_new/isolinux/txt.cfg
+  append file=/cdrom/preseed/ubuntu-server.seed initrd=/install/initrd.gz auto=true priority=high preseed/file=/cdrom/preseed/ubuntu.seed preseed/file/checksum=$CHECKSUM --" "$ISO_NEW/isolinux/txt.cfg"
 
-echo " creating the remastered iso"
-cd $TMP/iso_new
-(mkisofs -D -r -V "NETSON_UBUNTU" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $TMP/$ISO . > /dev/null 2>&1) &
+## Create the remastered ISO
+cd "$ISO_NEW"
+(mkisofs -D -r -V "CARRYBAG_UBUNTU" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 5 -boot-info-table -o $TMP/$ISO . > /dev/null 2>&1) &
 spinner $!
 
-# make iso bootable (for dd'ing to  USB stick)
-if [[ $bootable == "yes" ]] || [[ $bootable == "y" ]]; then
-    isohybrid $TMP/$ISO
-fi
+## Make ISO bootable (for dd'ing to  USB stick)
+[[ $BOOTABLE == "Y" ]] && isohybrid "$TMP/$ISO"
 
-# cleanup
-umount $TMP/iso_org
-rm -rf $TMP/iso_new
-rm -rf $TMP/iso_org
+# ============================================================================
+# Clean up
 
-# print info to user
-echo " -----"
-echo " finished remastering your ubuntu iso file"
-echo " the new file is located at: $TMP/$ISO"
-echo " your username is: $username"
-echo " your password is: $password"
-echo " your hostname is: $hostname"
-echo " your timezone is: $timezone"
+umount "$ISO_SRC"
+rm -rf "$ISO_NEW"
+rm -rf "$ISO_SRC"
+
+echo "Ubuntu Server ISO complete"
+echo -e "\tISO: $TMP/$ISO"
+echo -e "\tHostname: $HOSTNAME"
+echo -e "\tUser name: $USER"
+echo -e "\tPassword: $PASSWD"
 echo

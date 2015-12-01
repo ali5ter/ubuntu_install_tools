@@ -17,14 +17,16 @@ The script will ask what version of Ubuntu to use and the account credentials th
 
 The resulting ISO can be burnt to CDROM or USB drive or used to create a virtual machine.
 
-[Some utility to create an ESX or Fusion VM using this ISO]
-
 ## Configuration
-Run the `post_install.sh` script. You could run it without cloning this repository using
+If you created a server using the unattended installation ISO (described above), then log into the server using the credentials defined by it and in the home directory will be the `post_install.sh` script. Run this script for an interactive configuration:
+
+    sudo ./post_install.sh
+
+For systems created without the unattended installation ISO, download and run the script like this
 
     wget -O - http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/post_install.sh | bash
 
-You can change the defaults located at the top of this shell script or change them from teh command line. To do this with the command above use
+You can change the defaults located at the top of this shell script or provide them from the command line like this
 
     wget -O - http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/post_install.sh | bash -s <hostname> <domain>
 

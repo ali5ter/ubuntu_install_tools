@@ -7,10 +7,17 @@
 
 set -e
 
+randomWord() {
+    local file=/usr/share/dict/words
+    length="$(cat $file | wc -l)"
+    n=$(expr $RANDOM \* $length \/ 32768 + 1)
+    head -n $n $file | tail -1
+}
+
 # ============================================================================
 # Environment
 
-HOSTNAME="${1:-$(hostname)}"
+HOSTNAME="${1:-$(randomWord)}"
 DOMAIN="${2:-'.local'}"
 
 [ "$(id -u)" != "0" ] && {

@@ -49,19 +49,20 @@ PASSWD="\\!QAZ2wsx"
 
 UNAME=$(uname | tr "[:upper:]" "[:lower:]")
 [ "$UNAME" == "linux" ] && {
-    [ -f /etc/lsb_release ] && DISTRO=$(lsb_release -is)
+    [ -f /etc/lsb-release ] && DISTRO=$(lsb_release -is)
 }
 [ "$DISTRO" == "" ] && {
     echo "Run this script on an Ubuntu system"
     exit 1;
 }
 
-if [ $(program_is_installed "mkpasswd") -eq 0 ] || [ $(program_is_installed "mkisofs") -eq 0 ]; then
+[ "$(program_is_installed "mkpasswd")" -eq 0 ] || \
+        [ "$(program_is_installed "mkisofs")" -eq 0 ] && {
     (apt-get -y update > /dev/null 2>&1) &
     spinner $!
     (apt-get -y install whois genisoimage > /dev/null 2>&1) &
     spinner $!
-fi
+}
 
 # ============================================================================
 # User prompts

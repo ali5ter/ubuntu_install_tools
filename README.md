@@ -10,7 +10,8 @@ Tested for installations of:
 
 Download the `create_iso.sh` script and run it. This will build a customized version of an Ubuntu Server ISO that will perform an unattended installation.
 
-    wget -O - http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/create_iso.sh
+    wget http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/create_iso.sh
+    chmod 755 create_iso.sh
     ./create_iso.sh
 
 The script will ask what version of Ubuntu to use and the account credentials the installation should create.

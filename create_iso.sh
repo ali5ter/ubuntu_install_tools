@@ -94,14 +94,15 @@ done
 
 read -erp "Timezone: " -i "$TIMEZONE" TIMEZONE
 read -erp "User name: " -i "$USER" USER
-read -srp "Password: " -i "$PASSWD" PASSWD
+read -erp "Password: " -i "$PASSWD" PASSWD
 read -erp "Make ISO bootable via USB [Y|n]: " -i 'Y' BOOTABLE
 
 # ============================================================================
 # Download files
 
 cd "$TMP"
-[[ -f "$TMP/$DL_FILE" ]] || { echo -n "Downloading $DL_FILE: "
+[[ -f "$TMP/$DL_FILE" ]] || {
+    echo -n "Downloading $DL_FILE: "
     download "$DL_LOC$DL_FILE"
 }
 
@@ -156,10 +157,10 @@ d-i preseed/late_command                                    string      $LATE_CM
 EPASSWD="$(echo $PASSWD | mkpasswd -s -m sha-512)"
 
 ## Update the defaults with the user prompted data
-sed -i "s@{{username}}@$USER@g" "$ISO_NEW/preseed/$DEFAULTS"
-sed -i "s@{{pwhash}}@$EPASSWD@g" "$ISO_NEW/preseed/$DEFAULTS"
-sed -i "s@{{hostname}}@$HOSTNAME@g" "$ISO_NEW/preseed/$DEFAULTS"
-sed -i "s@{{timezone}}@$TIMEZONE@g" "$ISO_NEW/preseed/$DEFAULTS"
+sed -i "s%{{username}}%$USER%g" "$ISO_NEW/preseed/$DEFAULTS"
+sed -i "s%{{pwhash}}%$EPASSWD%g" "$ISO_NEW/preseed/$DEFAULTS"
+sed -i "s%{{hostname}}%$HOSTNAME%g" "$ISO_NEW/preseed/$DEFAULTS"
+sed -i "s%{{timezone}}%$TIMEZONE%g" "$ISO_NEW/preseed/$DEFAULTS"
 
 ## Calculate the checksum for the defaults file
 CHECKSUM=$(md5sum $ISO_NEW/preseed/$DEFAULTS)

@@ -49,7 +49,7 @@ PASSWD="\\!QAZ2wsx"
 
 UNAME=$(uname | tr "[:upper:]" "[:lower:]")
 [ "$UNAME" == "linux" ] && {
-    [ -f /etc/lsb-release ] && DISTRO=$(lsb-release -is)
+    [ -f /etc/lsb_release ] && DISTRO=$(lsb_release -is)
 }
 [ "$DISTRO" == "" ] && {
     echo "Run this script on an Ubuntu system"

@@ -72,6 +72,7 @@ UNAME=$(uname | tr "[:upper:]" "[:lower:]")
 # ============================================================================
 # User prompts
 
+echo
 while true; do
     echo "Which Ubuntu version should be remastered:"
     echo
@@ -187,12 +188,15 @@ spinner $!
 # Clean up
 
 umount "$ISO_SRC"
-rm -rf "$ISO_NEW"
-rm -rf "$ISO_SRC"
+rm -rf "$ISO_NEW" "$ISO_SRC"
 
-echo "Ubuntu Server ISO complete"
-echo -e "\tISO: $TMP/$ISO"
-echo -e "\tHostname: $HOSTNAME"
-echo -e "\tUser name: $USER"
-echo -e "\tPassword: $PASSWD"
 echo
+echo "Remastered Ubuntu Server ISO complete and available at"
+echo "$TMP/$ISO"
+echo
+echo "The ISO is preconfigured with the following values:"
+echo "  Hostname:     $HOSTNAME"
+echo "  User name:    $USER"
+echo "  Password:     $PASSWD"
+echo
+echo "Note that the post installation script is configured to run."

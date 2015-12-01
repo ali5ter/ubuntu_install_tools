@@ -97,6 +97,7 @@ while true; do
     esac
 done
 
+echo
 read -erp "Timezone: " -i "$TIMEZONE" TIMEZONE
 read -erp "User name: " -i "$USER" USER
 read -erp "Password: " -i "$PASSWD" PASSWD
@@ -141,8 +142,6 @@ grep -qs "$ISO_SRC" /proc/mounts || \
 (cp -rT "$ISO_SRC" "$ISO_NEW" > /dev/null 2>&1) &
 spinner $!
 
-cd "$ISO_NEW"
-
 ## Set the language for the installation menu
 echo en > "$ISO_NEW/isolinux/lang"
 
@@ -151,7 +150,7 @@ LATE_CMD="chroot /target wget -O /home/$USER/post_install.sh http://gitlab.diffe
     chroot /target chmod +x /home/$USER/post_install.sh ;"
 
 ## Copy the defaults file to the ISO
-cp -rT "$TMP/$DEFAULTS $TMP/iso_new/preseed/$DEFAULTS"
+cp -rT "$TMP/$DEFAULTS" "$TMP/iso_new/preseed/$DEFAULTS"
 
 ## Append the late command
 echo "
@@ -171,13 +170,13 @@ sed -i "s%{{timezone}}%$TIMEZONE%g" "$ISO_NEW/preseed/$DEFAULTS"
 CHECKSUM=$(md5sum $ISO_NEW/preseed/$DEFAULTS)
 
 ## Add the autoinstall option to the menu
+cd "$ISO_NEW"
 sed -i "/label install/ilabel autoinstall\n\
   menu label ^Autoinstall CarryBag Ubuntu Server\n\
   kernel /install/vmlinuz\n\
   append file=/cdrom/preseed/ubuntu-server.seed initrd=/install/initrd.gz auto=true priority=high preseed/file=/cdrom/preseed/ubuntu.seed preseed/file/checksum=$CHECKSUM --" "$ISO_NEW/isolinux/txt.cfg"
 
 ## Create the remastered ISO
-cd "$ISO_NEW"
 (mkisofs -D -r -V "CARRYBAG_UBUNTU" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 5 -boot-info-table -o $TMP/$ISO . > /dev/null 2>&1) &
 spinner $!
 

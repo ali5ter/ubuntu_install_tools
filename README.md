@@ -28,7 +28,7 @@ The resulting ISO can be burnt to CDROM, USB drive or mounted directly for
 other installation methods, such as creating a virtual machine.
 
 ## Virtual machine creation
-These are suggested based on how I've used these scripts in my own process.
+These are suggestions based on how I've used these scripts in my own process.
 
 ### ESXi v5.5 & v6
 The `create_esxi_vm.sh` script generates the files needed to create a virtual

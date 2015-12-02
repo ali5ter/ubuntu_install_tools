@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# @file create_esx_vm.sh
+# @file create_esxi_vm.sh
 # Create a virtual machine on an ESXi host
 # Credited work: Tamas Piros (tamaspiros)
 # @see https://github.com/tamaspiros/auto-create

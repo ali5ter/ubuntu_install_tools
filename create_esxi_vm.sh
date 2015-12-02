@@ -84,8 +84,8 @@ while getopts n:c:m:s:i: opt; do
             ;;
         i)
             ISO_PATH=${OPTARG}
-            if [ ! $(echo "$ISO_PATH" | egrep "^.*\.(iso)$") ]; then
-                echo "The ISO filepath extension must be .iso"
+            if [ ! -f "$ISO_PATH" ]; then
+                echo "$ISO_PATH does not exist"
             fi
             ;;
         h)  help; exit 1;;
@@ -95,15 +95,10 @@ while getopts n:c:m:s:i: opt; do
     esac
 done
 
-if [ -d "$NAME" ]; then
+VM_DIR="$DATASTORE/$NAME"
+if [ -d "$VM_DIR" ]; then
     echo "A virtual machine of name, $NAME, exists already"
     exit
-fi
-
-VM_DIR="$DATASTORE/$NAME"
-if [ ! -f "$VM_DIR" ]; then
-    echo "$VM_DIR does not exist"
-    exit 1
 fi
 
 # ============================================================================

@@ -13,6 +13,7 @@ DATASTORE="/vmfs/volumes/datastore1"
 ISO_PATH=""
 
 help() {
+    echo
     echo "Create a virtual machine on an ESXi host"
     echo
     echo "Usage:"
@@ -26,12 +27,13 @@ help() {
     echo "  -s  Storage capacity in GB, thin provisioned [default: $STORAGE]."
     echo "  -d  Datastore path [default: $DATASTORE]."
     echo "  -i  Filepath of an ISO file used to install the operating system."
+    echo
 }
 
 # ============================================================================
 # Parse and validate options
 
-while getopts n:c:m:s:i: opt; do
+while getopts n:c:m:s:i:h opt; do
     case $opt in
         n)
             NAME=${OPTARG};
@@ -94,6 +96,11 @@ while getopts n:c:m:s:i: opt; do
         *)  echo "Unimplimented option: -$OPTARG" >&2; help; exit 1;;
     esac
 done
+
+if [ -z "$NAME" ]; then
+    echo "Provide a name for the virtual name"
+    exit 1
+fi
 
 VM_DIR="$DATASTORE/$NAME"
 if [ -d "$VM_DIR" ]; then

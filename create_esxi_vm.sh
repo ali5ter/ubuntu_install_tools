@@ -15,8 +15,8 @@ help() {
     echo "Create a virtual machine on an ESXi host"
     echo
     echo "Usage:"
-    echo "  create_esx_vm.sh -n <name> [-c <number_of_vcpus>] [-m <memory_in_mb>] [-s <storage_in_gb>] [-i <iso_filepath>]"
-    echo "  create_esx_vm.sh -h"
+    echo "  create_esxi_vm.sh -n <name> [-c <number_of_vcpus>] [-m <memory_in_mb>] [-s <storage_in_gb>] [-i <iso_filepath>]"
+    echo "  create_esxi_vm.sh -h"
     echo
     echo "Options:"
     echo "  -n  Name of the virtual machine."

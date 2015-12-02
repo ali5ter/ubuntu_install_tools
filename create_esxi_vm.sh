@@ -97,13 +97,18 @@ done
 
 VM_DIR="$DATASTORE/$NAME"
 if [ -d "$VM_DIR" ]; then
-    echo "A virtual machine of name, $NAME, exists already"
+    echo "This already exists at $VM_DIR"
+    echo "You can remove this directory but remember to unregister it first"
+    echo "List the VM id using 'vim-cmd /vmsvc/getallvms'"
+    echo "Then unregister it using 'vim-cmd /vmsvc/unregister <Vmid>'"
+    ## @see http://www.yellow-bricks.com/2011/11/16/esxi-commandline-work/
     exit
 fi
 
 # ============================================================================
 # Confirmation
 
+echo
 echo "A virtual machine will be created using this specification:"
 echo "  Name:     $NAME"
 echo "  vCPUs:    $vCPU"
@@ -112,12 +117,13 @@ echo "  Storage:  ${STORAGE}GB"
 if [ -n "$ISO_PATH" ]; then
     echo "  ISO file: $ISO_PATH"
 fi
-echo "The virtual machine will be located at"
-echo "$VM_DIR"
+echo
+echo "The virtual machine will be located at $VM_DIR"
 echo
 echo "Do you want to continue? [y|n]"
 read -r answer
 if [ "$answer" != "y" ]; then exit 1; fi
+echo
 
 # ============================================================================
 # Virtual machine build environment

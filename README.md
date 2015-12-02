@@ -32,43 +32,40 @@ These are suggested based on how I've used these scripts in my own process.
 
 ### ESXi v5.5 & v6
 The `create_esxi_vm.sh` script generates the files needed to create a virtual
-machine and registers it with the ESXi system. The the `default.vmx` file
-provides the template of required metadata.
+machine and register it with the ESXi system. The the `default.vmx` file
+provides a template specification for the virtual machine.
 
 If you're using the unattended installation ISOs described above, assuming SSH
-and ESXi Shell is enabled, upload them to your ESXi datastore
+and ESXi Shell is enabled, upload them to your ESXi datastore. For example:
 
     scp /tmp/*unattended.iso root@esxi-001.foo.com:/vmfs/volumes/datastore1/ISOs/
 
-Log into the ESXi server and download the script and metadata template
+Log into the ESXi server and download the script like this
 
     wget http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/create_esxi_vm.sh && chmod 755 create_esxi_vm.sh
-    wget http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/default.vmx
 
-Create a VM using the vCPU, memory and storage defaults using one of the
-installation ISOs
+Create a virtual machine using the vCPU, memory and storage defaults using one
+of the installation ISOs like this
 
     ./create_esxi_vm.sh -n server_01 -i /vmfs/volumes/datastore1/ISOs/ubuntu-14.04.3-server-amd64-unattended.iso
 
 For help about changing the defaults run
 
     ./create_esxi_vm.sh -h
-    
-The virtual machine will automically power on and, if you used the unattended
-installation ISO described above, will install Ubuntu Server immediately. After
-a few minutes it will reboot and end on a login prompt.
 
-To perform post installation configuration, open a console on the virtual 
+Once complete, the virtual machine will automically power on. If you used the
+unattended installation ISO described above, the installation will occur as
+soon as the virtual machine has powered on. After a few minutes it will reboot
+and end on a login prompt.
+
+To perform post installation configuration, open a console on the virtual
 machine, login using the credentials defined.
-
-### VMware Fusion 7 & 8
-[Process description to come]
 
 ## Post installation
 The `post_install.sh` script will patch the Ubuntu OS, configure some basic
 security settings and install the [CarryBag environment](http://gitlab.different.com/alister/carrybag).
 
-If you create a Ubuntu Server using the unattended installation ISO described
+If you created a Ubuntu Server using the unattended installation ISO described
 above, then log into the server using the preferred credentials defined and run
 
     sudo ./post_install.sh

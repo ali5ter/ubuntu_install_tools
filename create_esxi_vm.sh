@@ -142,6 +142,10 @@ VMDK="$VM_DIR/$NAME.vmdk"
 DEFAULT_VMX="default.vmx"
 VMX="$VM_DIR/$NAME.vmx"
 
+if [ ! -f "$DEFAULT_VMX" ]; then
+    wget -O "$DEFAULT_VMX" http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/default.vmx
+fi
+
 mkdir -p "$VM_DIR"
 
 # ============================================================================

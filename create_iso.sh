@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # @file create_iso.sh
 # Create an unattended Ubuntu Server ISO
-# Credited work: Rinck Sonnenberg (Netson)
+# Based on original work by Rinck Sonnenberg (Netson)
 # @see https://github.com/netson/ubuntu-unattended
 
 set -e

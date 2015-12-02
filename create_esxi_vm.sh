@@ -115,8 +115,11 @@ echo "  vCPUs:    $vCPU"
 echo "  Memory:   ${MEMORY}MB"
 echo "  Storage:  ${STORAGE}GB"
 if [ -n "$ISO_PATH" ]; then
-    echo "  ISO file: $VM_DIR"
+    echo "  ISO file: $ISO_PATH"
 fi
+echo "The virtual machine will be located at"
+echo "$VM_DIR"
+echo
 echo "Do you want to continue? [y|n]"
 read -r answer
 if [ "$answer" != "y" ]; then exit 1; fi

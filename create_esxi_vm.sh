@@ -9,20 +9,22 @@ set -e
 vCPU=1
 MEMORY=1024
 STORAGE=16
+DATASTORE="/vmfs/volumes/datastore1"
 ISO_PATH=""
 
 help() {
     echo "Create a virtual machine on an ESXi host"
     echo
     echo "Usage:"
-    echo "  create_esxi_vm.sh -n <name> [-c <number_of_vcpus>] [-m <memory_in_mb>] [-s <storage_in_gb>] [-i <iso_filepath>]"
+    echo "  create_esxi_vm.sh -n <name> [-c <number_of_vcpus>] [-m <memory_in_mb>] [-s <storage_in_gb>] [-d <datastore_path>] [-i <iso_filepath>]"
     echo "  create_esxi_vm.sh -h"
     echo
     echo "Options:"
     echo "  -n  Name of the virtual machine."
-    echo "  -c  Number of virtual CPUs from 1 to 32 [default: 1]."
-    echo "  -m  Memory capacity in MB [default: 1024]."
-    echo "  -s  Storage capacity in GB, thin provisioned [default: 16]."
+    echo "  -c  Number of virtual CPUs from 1 to 32 [default: $vCPU]."
+    echo "  -m  Memory capacity in MB [default: $MEMORY]."
+    echo "  -s  Storage capacity in GB, thin provisioned [default: $STORAGE]."
+    echo "  -d  Datastore path [default: $DATASTORE]."
     echo "  -i  Filepath of an ISO file used to install the operating system."
 }
 
@@ -74,12 +76,19 @@ while getopts n:c:m:s:i: opt; do
                 exit 1
             fi
             ;;
+        d)  DATASTORE=${OPTARG}
+            if [ ! -d "$DATASTORE" ]; then
+                echo "Datastore path does not exist"
+                exit 1
+            fi
+            ;;
         i)
             ISO_PATH=${OPTARG}
             if [ ! $(echo "$ISO_PATH" | egrep "^.*\.(iso)$") ]; then
                 echo "The ISO filepath extension must be .iso"
             fi
             ;;
+        h)  help; exit 1;;
         \?) echo "Unknown option: -$OPTARG" >&2; help; exit 1;;
         :)  echo "Missing option argument for -$OPTARG" >&2; help; exit 1;;
         *)  echo "Unimplimented option: -$OPTARG" >&2; help; exit 1;;
@@ -87,14 +96,34 @@ while getopts n:c:m:s:i: opt; do
 done
 
 if [ -d "$NAME" ]; then
-    echo "A virtual machine of name, $NAME, exists already."
+    echo "A virtual machine of name, $NAME, exists already"
     exit
 fi
+
+VM_DIR="$DATASTORE/$NAME"
+if [ ! -f "$VM_DIR" ]; then
+    echo "$VM_DIR does not exist"
+    exit 1
+fi
+
+# ============================================================================
+# Confirmation
+
+echo "A virtual machine will be created using this specification:"
+echo "  Name:     $NAME"
+echo "  vCPUs:    $vCPU"
+echo "  Memory:   ${MEMORY}MB"
+echo "  Storage:  ${STORAGE}GB"
+if [ -n "$ISO_PATH" ]; then
+    echo "  ISO file: $VM_DIR"
+fi
+echo "Do you want to continue? [y|n]"
+read -r answer
+if [ "$answer" != "y" ]; then exit 1; fi
 
 # ============================================================================
 # Virtual machine build environment
 
-VM_DIR="/vmfs/volumes/datastore1/$NAME"
 VMDK="$VM_DIR/$NAME.vmdk"
 DEFAULT_VMX="default.vmx"
 VMX="$VM_DIR/$NAME.vmx"
@@ -119,14 +148,4 @@ sed -i "s%{{iso_path}}%$ISO_PATH%g" "$VMX"
 CMD="$(vim-cmd solo/registervm $VMX)"
 vim-cmd vmsvc/power.on "$CMD"
 
-# ============================================================================
-# Clean up
-
-echo "The Virtual Machine is created with the spec:"
-echo "  Name:     ${NAME}"
-echo "  vCPUs:    ${vCPU}"
-echo "  Memory:   ${MEMORY}MB"
-echo "  Storage:  ${STORAGE}GB"
-if [ -n "$ISO_PATH" ]; then
-    echo "  ISO file: ${ISO_PATH}"
-fi
+echo "Virtual machine creation complete"

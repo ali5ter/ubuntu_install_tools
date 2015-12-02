@@ -32,7 +32,7 @@ These are suggested based on how I've used these scripts in my own process.
 
 ### ESXi v5.5 & v6
 The `create_esxi_vm.sh` script generates the files needed to create a virtual
-machine and registers it with the ESXi system. The the `defaults.vmx` file
+machine and registers it with the ESXi system. The the `default.vmx` file
 provides the template of required metadata.
 
 If you're using the unattended isntallation ISOs described above, assuming SSH
@@ -42,8 +42,8 @@ and ESXi Shell is enabled, upload them to your ESXi datastore
 
 Log into the ESXi server and download the script and metadata template
 
-    wget http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/create_esxi_vm.sh && cmod 755 create_esxi_vm.sh
-    wget http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/defaults.vmx
+    wget http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/create_esxi_vm.sh && chmod 755 create_esxi_vm.sh
+    wget http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/default.vmx
 
 Create a VM using the vCPU, memory and storage defaults using one of the
 installation ISOs
@@ -54,7 +54,7 @@ For help about changing the defaults run
 
     ./create_esxi_vm.sh -h
 
-## VMware Fusion 7 & 8
+### VMware Fusion 7 & 8
 [Process description to come]
 
 ## Post installation

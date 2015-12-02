@@ -97,11 +97,14 @@ done
 
 VM_DIR="$DATASTORE/$NAME"
 if [ -d "$VM_DIR" ]; then
+    echo
     echo "This already exists at $VM_DIR"
-    echo "You can remove this directory but remember to unregister it first"
-    echo "List the VM id using 'vim-cmd /vmsvc/getallvms'"
-    echo "Then unregister it using 'vim-cmd /vmsvc/unregister <Vmid>'"
+    echo
+    echo "You can remove this directory but remember to unregister it first:"
+    echo "1. List the VM id using 'vim-cmd /vmsvc/getallvms'"
+    echo "2. Then unregister it using 'vim-cmd /vmsvc/unregister <Vmid>'"
     ## @see http://www.yellow-bricks.com/2011/11/16/esxi-commandline-work/
+    echo
     exit
 fi
 

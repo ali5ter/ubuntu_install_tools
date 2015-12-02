@@ -92,4 +92,5 @@ If you've stumbled upon this project and wish to contribute, please
 
 ## Credits
 * [Netson's Unattended Ubuntu ISO Maker](https://github.com/netson/ubuntu-unattended)
+* [Tamaspiros's Auto-create script](https://github.com/tamaspiros/auto-create)
 * [Justin Ellingwood's Digital Ocean tutorials](https://www.digitalocean.com/community/tutorials/additional-recommended-steps-for-new-ubuntu-14-04-servers)

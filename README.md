@@ -35,7 +35,7 @@ The `create_esxi_vm.sh` script generates the files needed to create a virtual
 machine and registers it with the ESXi system. The the `default.vmx` file
 provides the template of required metadata.
 
-If you're using the unattended isntallation ISOs described above, assuming SSH
+If you're using the unattended installation ISOs described above, assuming SSH
 and ESXi Shell is enabled, upload them to your ESXi datastore
 
     scp /tmp/*unattended.iso root@esxi-001.foo.com:/vmfs/volumes/datastore1/ISOs/
@@ -53,6 +53,13 @@ installation ISOs
 For help about changing the defaults run
 
     ./create_esxi_vm.sh -h
+    
+The virtual machine will automically power on and, if you used the unattended
+installation ISO described above, will install Ubuntu Server immediately. After
+a few minutes it will reboot and end on a login prompt.
+
+To perform post installation configuration, open a console on the virtual 
+machine, login using the credentials defined.
 
 ### VMware Fusion 7 & 8
 [Process description to come]

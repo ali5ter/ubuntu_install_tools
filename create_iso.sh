@@ -3,6 +3,7 @@
 # Create an unattended Ubuntu Server ISO
 # Based on original work by Rinck Sonnenberg (Netson)
 # @see https://github.com/netson/ubuntu-unattended
+# @author Alister Lewis-Bowen <alister@lewis-bowen.org>
 
 set -e
 

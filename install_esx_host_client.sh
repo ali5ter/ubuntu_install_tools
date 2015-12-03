@@ -2,6 +2,7 @@
 # @file install_esx_host_client.sh
 # Download and install the ESXi html client and patch
 # @see https://labs.vmware.com/flings/esxi-embedded-host-client
+# @author Alister Lewis-Bowen <alister@lewis-bowen.org>
 
 set -e
 

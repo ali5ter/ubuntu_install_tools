@@ -3,6 +3,7 @@
 # Create a virtual machine on an ESXi host
 # Based on original work by Tamas Piros (tamaspiros)
 # @see https://github.com/tamaspiros/auto-create
+# @author Alister Lewis-Bowen <alister@lewis-bowen.org>
 
 set -e
 

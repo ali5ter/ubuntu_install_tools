@@ -4,6 +4,7 @@
 # @see https://www.digitalocean.com/community/tutorials/additional-recommended-steps-for-new-ubuntu-14-04-servers
 # @see https://github.com/netson/ubuntu-unattended
 # @see http://gitlab.different.com/alister/carrybag/
+# @author Alister Lewis-Bowen <alister@lewis-bowen.org>
 
 set -e
 

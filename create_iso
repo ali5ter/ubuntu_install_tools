@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @file create_iso.sh
+# @file create_iso
 # Create an unattended Ubuntu Server ISO
 # Based on original work by Rinck Sonnenberg (Netson)
 # @see https://github.com/netson/ubuntu-unattended
@@ -149,8 +149,8 @@ spinner $!
 echo en > "$ISO_NEW/isolinux/lang"
 
 ## Create the late command for post installation configuration
-LATE_CMD="chroot /target wget -O /home/$USER/post_install.sh http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/post_install.sh;\
-    chroot /target chmod +x /home/$USER/post_install.sh ;"
+LATE_CMD="chroot /target wget -O /home/$USER/post_install http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/post_install;\
+    chroot /target chmod +x /home/$USER/post_install ;"
 
 ## Copy the defaults file to the ISO
 cp -rT "$TMP/$DEFAULTS" "$TMP/iso_new/preseed/$DEFAULTS"

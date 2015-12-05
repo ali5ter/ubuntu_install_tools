@@ -18,7 +18,7 @@ randomWord() {
 # ============================================================================
 # Environment
 
-HOSTNAME="${1:-$(randomWord)}"
+HOSTNAME="${1:-$(hostname -s)}"
 DOMAIN="${2:-local}"
 
 [ "$(id -u)" != "0" ] && {
@@ -27,7 +27,7 @@ DOMAIN="${2:-local}"
 }
 
 echo
-read -erp "Preferred hostname: " -i "$HOSTNAME" HOSTNAME
+read -erp "Preferred hostname (suggestion: $(randomWord)): " -i "$HOSTNAME" HOSTNAME
 read -erp "Preferred domain: " -i "$DOMAIN" DOMAIN
 
 FQDN="$HOSTNAME.$DOMAIN"

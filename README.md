@@ -72,11 +72,7 @@ will delete itself and reboot the system.
 For systems created without the unattended installation ISO, you could download
 the script in various way. Here are some suggestions
 
-    wget -Oq http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/post_install.sh && chmod 755 post_install
-
-    wget -Oq - http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/post_install | bash
-
-    wget -Oq - http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/post_install | bash -s <hostname> <domain>
+    wget -Oq http://gitlab.different.com/alister/ubuntu_install_tools/raw/master/post_install && chmod 755 post_install
 
 ## Contribution
 If you've stumbled upon this project and wish to contribute, please

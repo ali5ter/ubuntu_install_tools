@@ -1,3 +1,5 @@
+> **⚠️ Archived 2025-11-24. No longer maintained.**
+
 # Ubuntu Install Tools
 Scripts to help speed up the installation and configuration of an ubuntu server.
 
